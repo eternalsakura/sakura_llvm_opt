@@ -1,6 +1,0 @@
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/CMakeFiles/intrinsics_gen.dir
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/src/CMakeFiles/rebuild_cache.dir
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/src/CMakeFiles/edit_cache.dir
-/Users/sakura/CLionProjects/assignment1/cmake-build-debug/src/CMakeFiles/Assignment1.dir
