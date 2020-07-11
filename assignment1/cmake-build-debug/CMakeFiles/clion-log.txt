@@ -1,0 +1,8 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/sakura/CLionProjects/assignment1
+-- LLVM_HOME = /usr/local/opt/llvm
+-- LLVM_DIR = /usr/local/opt/llvm/lib/cmake/llvm
+/usr/local/opt/llvm/lib
+/usr/local/opt/llvm/include
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/sakura/CLionProjects/assignment1/cmake-build-debug
