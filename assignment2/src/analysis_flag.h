@@ -1,0 +1,8 @@
+//
+// Created by sakura on 2020/7/14.
+//
+
+#ifndef ASSIGNMENT2_ANALYSIS_FLAG_H
+#define ASSIGNMENT2_ANALYSIS_FLAG_H
+#define LA 0
+#endif //ASSIGNMENT2_ANALYSIS_FLAG_H
