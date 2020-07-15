@@ -2,6 +2,36 @@
 // Created by sakura on 2020/7/12.
 //
 
+// 初始状态, 注意_inst_bv_map总是保存着"经过传递函数变换之后的state",即对于前向数据流分析，
+// 它保存的是output state，而对于后向数据流分析，则保存的是input state。
+// 在同一个基本块内，顺着数据流分析的方向，上一条指令的"output"即下一条指令的"input"
+// 另外要记得，我们初始化的，永远是经过传递函数变化之后的那个真正的"output",对于前向就是output，对于后向就是input
+
+// 下面按照后向去画图
+// 一个程序只能有"entry（其实叫end贴切一点)"一个出口点
+
+// end:
+    // outputN = BC = ∅
+    // instrN :
+    // inputN = IC = ∅
+    // ...
+    // output1 =
+    // instr1 :
+    // input1 = IC = ∅
+
+// bb2:
+//  ...
+
+// bb1:
+//假设bb1的后继是entry和bb2,则
+    // outputN = input[bb2] ∪ input[entry]
+    // instrN:
+    // inputN = IC = ∅
+
+    // output1 =
+    // instr1 :
+    // input1 = IC = ∅
+
 #include "framework.h"
 
 using namespace llvm;
@@ -56,7 +86,6 @@ namespace {
         }
 
         virtual BitVector BC() const override {
-            // OUT[entry] = Ø
             return BitVector(_domain.size());
         }
 
@@ -100,20 +129,22 @@ namespace {
                                   const BitVector &ibv,
                                   BitVector &obv) override {
             // use U (In - def)
-            bool hasChanges = false;
+            bool hasChanges;
             BitVector temp_obv = ibv;
-            // use
-            for (const Use &op : inst.operands()) {
-                //如果变量在domain中
-                // op的类型是use，因为Use中定义了operator Value *() const { return Val; }
-                // 这个将Use转换为其他类型值的类型转换规则，所以我们在需要Value*的地方可以直接传入op
-                int use_idx = position(Variable(op));
+//            // use
+            for (auto &op : inst.operands()) {
+//                //如果变量在domain中
+                const Value *op_val = dyn_cast<Value>(op.get());
+                assert(op_val != NULL);
+                int use_idx = position(Variable(op_val));
                 if (use_idx != -1) {
                     temp_obv[use_idx] = true;
                 }
             }
-            // def
-            int def_idx = position(Variable(&inst));
+//            // def
+            const Value *inst_op = dyn_cast<Value>(&inst);
+            assert(inst_op != NULL);
+            int def_idx = position(Variable(inst_op));
             if (def_idx != -1) {
                 temp_obv[def_idx] = false;
             }
@@ -123,7 +154,9 @@ namespace {
             return hasChanges;
         }
 
-        virtual void InitializeDomainFromInstruction(const Instruction &inst) override {
+
+        virtual void InitializeDomainFromInstruction(const Instruction &inst)
+        override {
             for (const Use &op : inst.operands()) {
                 if (isa<Instruction>(op) || isa<Argument>(op)) {
                     _domain.emplace(Variable(op));
@@ -137,11 +170,13 @@ namespace {
         Liveness() : dfa::Framework<domain_element_t,
                 direction_c>(ID) {}
 
-        virtual ~Liveness() override {}
+        virtual ~Liveness()
+        override {}
 
     };
 
     char Liveness::ID = 1;
-    RegisterPass<Liveness> Y("liveness", "Liveness");
+    RegisterPass<Liveness> Y(
+            "liveness", "Liveness");
 
 } // namespace anonymous

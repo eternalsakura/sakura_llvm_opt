@@ -18,7 +18,7 @@
 #include <llvm/IR/InstIterator.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/Support/raw_ostream.h>
-
+#include "analysis_flag.h"
 using namespace llvm;
 namespace dfa {
     //analysis direction, 用作模板参数
@@ -103,7 +103,7 @@ namespace dfa {
             const BasicBlock *const pbb = inst.getParent();
             if (&inst == &(*pbb->begin())) {
                 meetop_const_range meet_operands = MeetOperands(*pbb);
-                // 如果meet operands为空，则我们位于边界，打印出BC
+                // 如果前驱节点为空，则我们位于边界，打印出BC
                 if (meet_operands.empty()) {
                     outs() << "BC:\t";
                     printDomainWithMask(BC());
@@ -126,15 +126,18 @@ namespace dfa {
 
             if (&inst == &(*pbb->begin())) {
                 meetop_const_range meet_operands = MeetOperands(*pbb);
-                // If the list of meet operands is empty, then we are at
-                // the boundary, hence print the BC.
-                if (meet_operands.begin() == meet_operands.end()) {
+                //如果后继节点为空，则我们位于边界，打印出BC
+                if (meet_operands.empty()) {
                     outs() << "BC:\t";
                     printDomainWithMask(BC());
                     outs() << "\n";
                 } else {
                     outs() << "MeetOp:\t";
+#ifndef LA
                     printDomainWithMask(MeetOp(meet_operands));
+#else
+                    printDomainWithMask(MeetOp(*pbb));
+#endif
                     outs() << "\n";
                 }
             }
@@ -267,6 +270,7 @@ namespace dfa {
                 inputBV = initialBV;
                 for (auto &inst : InstTraversalOrder(bb)) {
                     changed |= TransferFunc(inst, inputBV, _inst_bv_map.at(&inst));
+                    //顺着数据流分析的方向，上一条指令的"output"即下一条指令的"input"
                     inputBV = _inst_bv_map.at(&inst);
                 }
             }

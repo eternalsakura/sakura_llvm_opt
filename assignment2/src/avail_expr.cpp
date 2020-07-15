@@ -3,6 +3,30 @@
 //
 #include "framework.h"
 
+// 初始状态, 注意_inst_bv_map总是保存着"经过传递函数变换之后的state",即对于前向数据流分析，
+// 它保存的是output state，而对于后向数据流分析，则保存的是input state。
+
+// 一个程序只能有entry一个入口点
+// entry:
+    // input1 = BC = ∅
+    // instr1 :
+    // output1 = IC = U
+
+    // input2 =
+    // instr2 :
+    // output2 = IC = U
+
+// bb1:
+//  ...
+
+// bb2:
+//假设bb2的前驱是entry和bb1,则
+    //input1 =  output[bb1] ∩ output[entry]
+    //instr1:
+    //output1 = IC = U
+    // input2 =
+    // instr2 :
+    // output2 = IC = U
 
 namespace {
 
@@ -84,24 +108,22 @@ namespace {
             dfa::Direction::Forward> {
     protected:
         virtual BitVector IC() const override {
-            // OUT[B] = U
             return BitVector(_domain.size(), true);
         }
 
         virtual BitVector BC() const override {
-            // OUT[entry] = Ø
-            return BitVector(_domain.size());
+            return BitVector(_domain.size(), false);
         }
 
         virtual BitVector MeetOp(const meetop_const_range &meet_operands) const override {
-            // Meet : ∩ OUT[P]
             BitVector result(_domain.size(), true);
             for (const BasicBlock *bb:meet_operands) {
-                result &= _inst_bv_map.at(bb->getTerminator());
+                result &= _inst_bv_map.at(&bb->back());
             }
-            return BitVector(_domain.size());
+            return result;
         }
-        virtual BitVector MeetOp(const BasicBlock& bb) const override {
+
+        virtual BitVector MeetOp(const BasicBlock &bb) const override {
             // 仅实现，不使用
             BitVector result(_domain.size(), true);
             return result;
