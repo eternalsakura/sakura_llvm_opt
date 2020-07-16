@@ -1,2 +1,3 @@
 # sakura_llvm_opt
-15-745 note
+- CSCD70 assignment
+https://github.com/ArmageddonKnight/CSCD70
