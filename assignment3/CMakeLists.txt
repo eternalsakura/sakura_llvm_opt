@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.4)
+project(assignment3)
+set(CMAKE_CXX_STANDARD 14)
+set(LLVM_HOME /usr/local/opt/llvm)
+set(LLVM_DIR ${LLVM_HOME}/lib/cmake/llvm)
+
+MESSAGE(STATUS "LLVM_HOME = ${LLVM_HOME}")
+MESSAGE(STATUS "LLVM_DIR = ${LLVM_DIR}")
+
+find_package(LLVM REQUIRED CONFIG)
+add_definitions(${LLVM_DEFINITIONS})
+include_directories(${LLVM_INCLUDE_DIRS})
+link_directories(${LLVM_LIBRARY_DIRS})
+MESSAGE(${LLVM_LIBRARY_DIRS})
+MESSAGE(${LLVM_INCLUDE_DIRS})
+add_subdirectory(src)
